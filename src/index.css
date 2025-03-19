@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+/* Apply styles globally */
+:root {
+  font-family: "Inter", Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  background-color: #ffffff;
+  color: #2d1b0a;
+  /* Dark brown for better contrast */
+  scroll-behavior: smooth;
+}
+
+/* Center the app and make it full-height */
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Main container that ensures full height for all pages */
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #4a2c16;
+  /* Deep brown for headings */
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #5a3a1b;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #6b4a2d;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Links */
+a {
+  font-weight: 500;
+  color: #8b572a;
+  /* Warm brown for links */
+  text-decoration: none;
+}
+
+a:hover {
+  color: #a35d2a;
+  /* Slightly lighter brown on hover */
+  text-decoration: underline;
+}
+
+/* Buttons */
+button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  background-color: #4a2c16;
+  color: white;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  background-color: #5a3a1b;
+}
+
+/* Make sure buttons and text adjust for dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: #121212;
+  }
+
+  button {
+    background-color: #2d1b0a;
+    color: white;
+  }
+
+  a:hover {
+    color: #d2a679;
+    /* Softer brown for hover effect in dark mode */
+  }
+}

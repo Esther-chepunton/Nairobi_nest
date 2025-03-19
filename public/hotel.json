@@ -1,0 +1,149 @@
+{
+  "hotels": [
+    {
+      "id": 1,
+      "name": "Luxury Hotel Nairobi",
+      "location": "Nairobi",
+      "price": 120,
+      "rating": 4.5,
+      "latitude": -1.286389,
+      "longitude": 36.817223,
+      "image": "/images/hotel1.webp",
+      "description": "A luxury hotel in the heart of Nairobi",
+      "amenities": ["Wi-Fi", "Pool", "Gym"]
+    },
+    {
+      "id": 2,
+      "name": "Serena Beach Resort",
+      "location": "Mombasa",
+      "price": 150,
+      "rating": 4.7,
+      "latitude": -4.043477,
+      "longitude": 39.668206,
+      "image": "/images/hotel2.avif",
+      "description": "A beachfront resort offering stunning views of the Indian Ocean",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant"]
+    },
+    {
+      "id": 3,
+      "name": "Lake Naivasha Country Club",
+      "location": "Naivasha",
+      "price": 100,
+      "rating": 4.3,
+      "latitude": -0.713611,
+      "longitude": 36.433056,
+      "image": "/images/hotel3.avif",
+      "description": "A serene retreat by Lake Naivasha",
+      "amenities": ["Wi-Fi", "Pool", "Golf Course", "Restaurant"]
+    },
+    {
+      "id": 4,
+      "name": "Mount Kenya Safari Club",
+      "location": "Nanyuki",
+      "price": 200,
+      "rating": 4.8,
+      "latitude": 0.016667,
+      "longitude": 37.066667,
+      "image": "/images/hotel4.avif",
+      "description": "An exclusive resort with views of Mount Kenya",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant", "Golf Course"]
+    },
+    {
+      "id": 5,
+      "name": "The Stanley Hotel",
+      "location": "Nairobi",
+      "price": 110,
+      "rating": 4.4,
+      "latitude": -1.284722,
+      "longitude": 36.821944,
+      "image": "/images/hotel5.avif",
+      "description": "A historic hotel in downtown Nairobi",
+      "amenities": ["Wi-Fi", "Pool", "Restaurant", "Bar"]
+    },
+    {
+      "id": 6,
+      "name": "Sarova Mara Game Camp",
+      "location": "Masai Mara",
+      "price": 180,
+      "rating": 4.6,
+      "latitude": -1.516667,
+      "longitude": 35.266667,
+      "image": "/images/hotel6.avif",
+      "description": "A luxury tented camp in the heart of the Masai Mara",
+      "amenities": ["Wi-Fi", "Pool", "Restaurant", "Game Drives"]
+    },
+    {
+      "id": 7,
+      "name": "Hemingways Nairobi",
+      "location": "Nairobi",
+      "price": 250,
+      "rating": 4.9,
+      "latitude": -1.268056,
+      "longitude": 36.811111,
+      "image": "/images/hotel7.avif",
+      "description": "A boutique hotel offering luxury accommodations",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant", "Bar"]
+    },
+    {
+      "id": 8,
+      "name": "Giraffe Manor",
+      "location": "Nairobi",
+      "price": 300,
+      "rating": 4.9,
+      "latitude": -1.366667,
+      "longitude": 36.75,
+      "image": "/images/hotel8.avif",
+      "description": "A unique hotel where giraffes roam freely",
+      "amenities": ["Wi-Fi", "Pool", "Restaurant", "Giraffe Feeding"]
+    },
+    {
+      "id": 9,
+      "name": "Fairmont Mount Kenya",
+      "location": "Nyeri",
+      "price": 170,
+      "rating": 4.5,
+      "latitude": -0.416667,
+      "longitude": 36.95,
+      "image": "/images/hotel9.avif",
+      "description": "A luxury hotel set against the backdrop of Mount Kenya",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant", "Golf Course"]
+    },
+    {
+      "id": 10,
+      "name": "Diani Reef Beach Resort",
+      "location": "Diani",
+      "price": 140,
+      "rating": 4.6,
+      "latitude": -4.316667,
+      "longitude": 39.583333,
+      "image": "/images/hotel10.avif",
+      "description": "A beachfront resort on the pristine Diani Beach",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant", "Water Sports"]
+    },
+    {
+      "id": 11,
+      "name": "Tribe Hotel Nairobi",
+      "location": "Nairobi",
+      "price": 220,
+      "rating": 4.7,
+      "latitude": -1.300556,
+      "longitude": 36.781944,
+      "image": "/images/hotel11.avif",
+      "description": "A chic and modern hotel in the vibrant Gigiri area",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant", "Fitness Center"]
+    },
+    {
+      "id": 12,
+      "name": "Enashipai Resort & Spa",
+      "location": "Naivasha",
+      "price": 130,
+      "rating": 4.4,
+      "latitude": -0.733333,
+      "longitude": 36.433333,
+      "image": "/images/hotel12.avif",
+      "description": "A luxurious resort offering a tranquil escape near Lake Naivasha",
+      "amenities": ["Wi-Fi", "Pool", "Spa", "Restaurant", "Gym","Bar","Air Conditioning"]
+    }
+    
+  ]
+}
