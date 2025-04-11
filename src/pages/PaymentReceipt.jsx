@@ -1,15 +1,34 @@
+import axios from "axios";
+import { motion } from "framer-motion";
 import React, { useState } from "react";
+import {
+  FaCcMastercard,
+  FaCcVisa,
+  FaMobileAlt,
+  FaPaypal,
+} from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { motion } from "framer-motion";
-import {
-  FaCcVisa,
-  FaCcMastercard,
-  FaPaypal,
-  FaMobileAlt,
-} from "react-icons/fa";
 
 const PaymentReceipt = () => {
+  const paymentMethods = [
+    {
+      id: "mpesa",
+      name: "M-Pesa",
+      icon: <FaMobileAlt className="text-green-600" />,
+    },
+    { id: "visa", name: "Visa", icon: <FaCcVisa className="text-blue-600" /> },
+    {
+      id: "paypal",
+      name: "PayPal",
+      icon: <FaPaypal className="text-blue-500" />,
+    },
+    {
+      id: "mastercard",
+      name: "MasterCard",
+      icon: <FaCcMastercard className="text-red-600" />,
+    },
+  ];
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -31,65 +50,99 @@ const PaymentReceipt = () => {
   const [receipt, setReceipt] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const paymentMethods = [
-    {
-      id: "mpesa",
-      name: "M-Pesa",
-      icon: <FaMobileAlt className="text-green-600" />,
-    },
-    { id: "visa", name: "Visa", icon: <FaCcVisa className="text-blue-600" /> },
-    {
-      id: "paypal",
-      name: "PayPal",
-      icon: <FaPaypal className="text-blue-500" />,
-    },
-    {
-      id: "mastercard",
-      name: "MasterCard",
-      icon: <FaCcMastercard className="text-red-600" />,
-    },
-  ];
+  const handlePaymentMethodSelect = (methodId) => {
+    setFormData((prev) => ({
+      ...prev,
+      paymentMethod: methodId,
+      // Reset payment-specific fields when changing methods
+      ...(methodId !== "mpesa" && {
+        mpesaPhoneNumber: "",
+        mpesaBusinessNumber: "",
+      }),
+      ...(methodId !== "visa" &&
+        methodId !== "mastercard" && {
+          cardNumber: "",
+          cardholderName: "",
+          expiryDate: "",
+          cvv: "",
+        }),
+      ...(methodId !== "paypal" && {
+        paypalEmail: "",
+        paypalCurrency: "",
+      }),
+    }));
+  };
 
+  // Add this helper function
+  const formatPhoneNumber = (value) => {
+    // Remove all non-digit characters
+    let digits = value.replace(/\D/g, "");
+
+    // Auto-format as user types (07... becomes 254...)
+    if (digits.startsWith("0") && digits.length > 1) {
+      digits = `254${digits.substring(1)}`;
+    }
+
+    return digits;
+  };
+
+  // Update your input handler
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    // Special handling for phone number
+    if (name === "mpesaPhoneNumber") {
+      const formatted = formatPhoneNumber(value);
+      setFormData({ ...formData, [name]: formatted });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
-  const handlePaymentMethodSelect = (method) => {
-    setFormData({ ...formData, paymentMethod: method });
-  };
-
-  const handlePayment = (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
-    if (!formData.paymentMethod) {
-      toast.error("Please select a payment method.", {
-        position: "top-center",
-      });
+
+    // Validate phone number format (254XXXXXXXXX)
+    const formattedPhone = formData.mpesaPhoneNumber.startsWith("254")
+      ? formData.mpesaPhoneNumber
+      : `254${formData.mpesaPhoneNumber.replace(/^0/, "")}`;
+
+    if (!/^254\d{9}$/.test(formattedPhone)) {
+      toast.error("Phone number must be in 254XXXXXXXXX format");
       return;
     }
 
-    toast.info("Processing payment...", { position: "top-center" });
-
     setIsProcessing(true);
-    setTimeout(() => {
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/mpesa-payment",
+        {
+          phone_number: formattedPhone,
+          amount: "1", // Test with 1 KSH first
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        toast.success("STK push sent to your phone");
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Payment failed. Please try again.";
+      toast.error(errorMsg);
+      console.error("Payment Error Details:", error.response?.data || error);
+    } finally {
       setIsProcessing(false);
-      const receiptContent = `
-        Hotel Booking Receipt
-        ---------------------
-        Name: ${formData.fullName}
-        Email: ${formData.email}
-        Phone: ${formData.phone || "N/A"}
-        Payment Method: ${formData.paymentMethod.toUpperCase()}
-        Amount: $200
-        Status: Paid
-        Date & Time: ${new Date().toLocaleString()}
-        Transaction ID: ${Math.random().toString(36).substring(2, 15)}
-      `;
-      setReceipt(receiptContent);
-      toast.success("Payment successful! Receipt generated.", {
-        position: "top-center",
-      });
-    }, 2000);
+    }
   };
 
   const downloadReceipt = () => {

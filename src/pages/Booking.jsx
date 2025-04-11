@@ -42,9 +42,8 @@ const Booking = () => {
     e.preventDefault();
     if (
       !formData.checkInDate ||
-      !formData.checkOutDate ||
-      formData.guests < 1 ||
-      formData.rooms < 1
+      !formData.checkOutDate 
+      
     ) {
       alert("Please fill out all required fields correctly.");
       return;
@@ -52,6 +51,30 @@ const Booking = () => {
 
     navigate("/payment", { state: { hotel, ...formData } });
   };
+  const handleConfirmBooking = () => {
+    const newBooking = {
+      hotelName: hotel.name,
+      checkInDate: formData.checkInDate,
+      checkOutDate: formData.checkOutDate,
+    };
+
+    // Store in localStorage
+    let existingBookings = [];
+    try {
+      existingBookings = JSON.parse(localStorage.getItem("userBookings")) || [];
+    } catch (error) {
+      console.error("Error parsing bookings:", error);
+    }
+
+    localStorage.setItem(
+      "userBookings",
+      JSON.stringify([...existingBookings, newBooking])
+    );
+
+    alert("Booking Confirmed!");
+    navigate("/dashboard");
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">

@@ -2,7 +2,9 @@ import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { FaSearchLocation } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Footer from "./Footer";
+import Footer from "../components/Footer";
+import Modal from "../components/Modal";
+import MapComponent from "../components/MapComponent";
 
 const Search = () => {
   const navigate = useNavigate();
@@ -17,6 +19,8 @@ const Search = () => {
   const [allLocations, setAllLocations] = useState([]);
   const [aiRecommendedHotels, setAiRecommendedHotels] = useState([]); // AI recommended hotels
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHotel, setSelectedHotel] = useState(null);
 
   useEffect(() => {
     const fetchHotels = async () => {
@@ -26,17 +30,12 @@ const Search = () => {
 
         if (data.hotels && Array.isArray(data.hotels)) {
           setHotels(data.hotels);
-
-          // Separate AI recommended hotels from search results
-          const shuffledHotels = [...data.hotels].sort(
-            () => Math.random() - 0.5
-          ); // Shuffle array
-          setAiRecommendedHotels(shuffledHotels.slice(0, 3)); // First 3 for AI recommendations
-
-          const locations = [
+          setAiRecommendedHotels(
+            [...data.hotels].sort(() => Math.random() - 0.5).slice(0, 3)
+          );
+          setAllLocations([
             ...new Set(data.hotels.map((hotel) => hotel.location)),
-          ];
-          setAllLocations(locations);
+          ]);
         } else {
           throw new Error(
             "Invalid JSON format. Expected an object with 'hotels' key."
@@ -50,7 +49,7 @@ const Search = () => {
     fetchHotels();
   }, []);
 
-  // Handle search form submission
+  // Search Logic
   const handleSearch = (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -58,7 +57,7 @@ const Search = () => {
     setTimeout(() => {
       setIsLoading(false);
 
-      // Filter hotels based on search location (supports cities + small towns)
+      // Filter hotels based on search input
       const filteredHotels = hotels.filter((hotel) =>
         hotel.location.toLowerCase().includes(location.toLowerCase())
       );
@@ -72,7 +71,7 @@ const Search = () => {
           adults,
           children,
           rooms,
-          hotels: filteredHotels.length > 0 ? filteredHotels : hotels, // If no match, show all
+          hotels: filteredHotels.length > 0 ? filteredHotels : hotels,
         })
       );
 
@@ -80,18 +79,35 @@ const Search = () => {
     }, 1500);
   };
 
-  // Autocomplete feature for location input
+  // Autocomplete Feature for Locations
   const handleLocationChange = (e) => {
     const inputValue = e.target.value;
     setLocation(inputValue);
-    if (inputValue.length > 1) {
-      const suggestions = allLocations.filter((loc) =>
-        loc.toLowerCase().includes(inputValue.toLowerCase())
-      );
-      setFilteredLocations(suggestions);
+    setFilteredLocations(
+      inputValue.length > 1
+        ? allLocations.filter((loc) =>
+            loc.toLowerCase().includes(inputValue.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  // Booking Logic
+  const isAuthenticated = !!localStorage.getItem("userToken");
+
+  const handleBooking = (hotel) => {
+    if (!isAuthenticated) {
+      setSelectedHotel(hotel); // Save the selected hotel for booking
+      setIsModalOpen(true); // Open modal prompting login/signup
     } else {
-      setFilteredLocations([]);
+      navigate("/booking", { state: { hotel } });
     }
+  };
+
+  // Handle Login from Modal
+  const handleLoginRedirect = () => {
+    setIsModalOpen(false);
+    navigate("/auth");
   };
 
   return (
@@ -104,7 +120,6 @@ const Search = () => {
         }}
       >
         <div className="absolute inset-0 bg-black opacity-40"></div>
-        
       </div>
 
       {/* Search Section */}
@@ -243,19 +258,26 @@ const Search = () => {
               <p className="text-gray-700 font-semibold mt-2">
                 Price: ${hotel.price}/night
               </p>
+              {hotel.latitude && hotel.longitude && (
+      <MapComponent latitude={hotel.latitude} longitude={hotel.longitude} />
+    )}
 
               {/* Book Now Button */}
               <button
-                onClick={() =>
-                  navigate(`/booking/${hotel.id}`, { state: { hotel } })
-                }
-                className="w-full mt-4 bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
+                onClick={handleLoginRedirect} // ✅ Use the defined function
+                className="w-full bg-[#795548] text-white p-3 rounded-lg hover:bg-[#5D4037] transition"
               >
                 Book Now
               </button>
             </div>
           ))}
         </div>
+        {/* Modal Component */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onLogin={handleLoginRedirect}
+        />
       </div>
 
       <Footer />

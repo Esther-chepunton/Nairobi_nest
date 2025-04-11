@@ -1,15 +1,31 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/home");
+
+    // Simulate user authentication (Replace with real API call if available)
+    const user = {
+      name: "Esther",
+      email: "estherchepunton@gmail.com",
+      token: "user12345", // Example token
+    };
+
+    // Save user data in localStorage
+    localStorage.setItem("userToken", user.token);
+    localStorage.setItem("userData", JSON.stringify(user));
+
+    // Redirect to the dashboard
+    navigate("/dashboard");
+    
   };
 
   return (
@@ -28,7 +44,7 @@ const Auth = () => {
           transition={{ duration: 0.5 }}
           className="text-3xl font-semibold mb-6 text-center text-blue-700"
         >
-          {isLogin ? "Welcome Back!" : "Create Your Account"}
+          {isLogin ? "Login" : "Sign Up"}
         </motion.h2>
 
         {/* 🔹 Form */}
