@@ -15,7 +15,7 @@ class HttpClient:
             {
                 "User-Agent": user_agent,
                 "Accept": "application/json, text/xml, */*;q=0.8",
-                "Referer": "https://github.com/Esther-chepunton/nairobi-nest-backend",
+                "Referer": "https://github.com/Esther-chepunton/Nairobi_nest",
             }
         )
 

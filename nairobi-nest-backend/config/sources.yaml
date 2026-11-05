@@ -41,4 +41,4 @@ scraper_allowlist:
   - kws.go.ke
   - museums.or.ke
 
-default_user_agent: "KijijiDiscovery/1.0 (portfolio project; +https://github.com/Esther-chepunton/nairobi-nest-backend)"
+default_user_agent: "KijijiDiscovery/1.0 (portfolio project; +https://github.com/Esther-chepunton/Nairobi_nest)"

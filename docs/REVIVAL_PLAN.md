@@ -14,7 +14,7 @@
 - Free-tier `render.yaml`, GitHub Actions for daily ingest and CI, and 33 backend tests.
 
 **Still open:**
-- Decide monorepo vs two repos. The backend still has its own `.git`.
+- ~~Decide monorepo vs two repos~~: merged into this repo. Older same-name repos renamed `Nairobi_nest-1` / `Nairobi_nest-2`.
 - Add your Daraja sandbox keys to `nairobi-nest-backend/.env`. It currently matches `.env.example`.
 - Create the Neon project, Render service, and Vercel env var, then deploy.
 - README screenshots and demo link once deployed.
@@ -56,7 +56,7 @@ the backend tests, and a smoke test of every main API route against a fresh SQLi
    from `.env` are ignored. (I confirmed this: M-Pesa reported missing credentials.) Fix: call `load_dotenv()`
    at the top of `run.py`/`config.py` before anything else is imported, and read keys from `current_app.config`.
 3. **Broken virtualenv.** Delete `nairobi-nest-backend/venv` and recreate it (`python -m venv venv`, then `pip install -r requirements.txt`).
-4. **Nested git repo.** `nairobi-nest-backend/` has its own `.git` (remote `Esther-chepunton/nairobi-nest-backend`)
+4. **Nested git repo.** `nairobi-nest-backend/` has its own `.git` (remote `Esther-chepunton/nairobi-nest-backend`, since renamed `Nairobi_nest-2`)
    and is untracked in the main repo. If you `git add` it, git records an empty pointer and the backend code
    never reaches GitHub, while `render.yaml` expects `rootDir: nairobi-nest-backend` in the same repo.
    Pick one: **monorepo** (recommended — remove the inner `.git` after pushing its last state, then commit it here)
