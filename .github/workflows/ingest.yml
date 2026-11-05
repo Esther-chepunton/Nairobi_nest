@@ -1,0 +1,50 @@
+# Daily data refresh: pulls places from OpenStreetMap + Wikipedia into the production
+# database, then rebuilds the search index. Replaces the paid Render cron jobs.
+#
+# Setup (GitHub repo -> Settings -> Secrets and variables -> Actions):
+#   secret   DATABASE_URL   Neon connection string (same one Render uses)
+#   variable OVERPASS_URL   optional Overpass mirror, e.g.
+#                           https://maps.mail.ru/osm/tools/overpass/api/interpreter
+name: Ingest places
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 05:00 Nairobi time
+  workflow_dispatch: {}
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: nairobi-nest-backend
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      OVERPASS_URL: ${{ vars.OVERPASS_URL }}
+      FLASK_ENV: production
+      SECRET_KEY: ingest-job-does-not-issue-tokens-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: nairobi-nest-backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Ingest OpenStreetMap
+        run: python -m jobs.worker run --task ingest --source openstreetmap
+        continue-on-error: true # one flaky source shouldn't block the rest
+      - name: Ingest Wikipedia
+        run: python -m jobs.worker run --task ingest --source wikipedia
+        continue-on-error: true
+      - name: Hide non-experience places (cities, airports, hotels)
+        run: python -m jobs.worker run --task cleanup_catalog
+      - name: Rebuild search index
+        run: python -m jobs.worker run --task reindex
+      - name: Prune expired cache
+        run: python -m jobs.worker run --task prune_cache

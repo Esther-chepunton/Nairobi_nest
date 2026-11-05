@@ -1,148 +1,131 @@
 import { motion } from "framer-motion";
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { apiPost, claimSearchSession } from "../lib/api";
+import { auth as authCopy } from "../lib/copy";
 
-const Auth = () => {
+export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Simulate user authentication (Replace with real API call if available)
-    const user = {
-      name: "Esther",
-      email: "estherchepunton@gmail.com",
-      token: "user12345", // Example token
-    };
-
-    // Save user data in localStorage
-    localStorage.setItem("userToken", user.token);
+  const persistSession = (token, user) => {
+    localStorage.setItem("userToken", token);
     localStorage.setItem("userData", JSON.stringify(user));
-
-    // Redirect to the dashboard
-    navigate("/dashboard");
-    
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 px-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md"
-      >
-        {/* 🔹 Title */}
-        <motion.h2
-          key={isLogin ? "login-title" : "signup-title"}
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl font-semibold mb-6 text-center text-blue-700"
-        >
-          {isLogin ? "Login" : "Sign Up"}
-        </motion.h2>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-        {/* 🔹 Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+    try {
+      if (!isLogin) {
+        await apiPost("/api/auth/signup", { full_name: fullName, email, password });
+      }
+      const data = await apiPost("/api/auth/login", { email, password });
+      persistSession(data.token, data.user);
+      // Attach any anonymous search session to this account before redirect.
+      await claimSearchSession().catch(() => null);
+      toast.success(isLogin ? authCopy.toast.welcomeBack : authCopy.toast.accountCreated);
+      const redirect = sessionStorage.getItem("authRedirect") || "/";
+      sessionStorage.removeItem("authRedirect");
+      navigate(redirect);
+    } catch (error) {
+      toast.error(error.message || authCopy.toast.failed);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const continueAsGuest = () => {
+    localStorage.setItem("kijiji_onboarded", "true");
+    navigate("/");
+  };
+
+  const copy = isLogin ? authCopy.signIn : authCopy.signUp;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-kijiji-deep px-4 pb-24">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-card p-8 w-full max-w-md"
+      >
+        <p className="text-kijiji-accent text-sm mb-1">{authCopy.eyebrow}</p>
+        <h2 className="font-serif text-3xl text-kijiji-text mb-2">{copy.title}</h2>
+        <p className="text-muted text-sm mb-6">{copy.subtitle}</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <motion.div
-              key="name-field"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <label className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500">
-                <FaUser className="text-gray-500 mr-2" />
+            <div>
+              <label className="block text-sm text-muted mb-2">{authCopy.labels.name}</label>
+              <div className="flex items-center gap-2 glass rounded-lg p-3">
+                <FaUser className="text-kijiji-accent" />
                 <input
                   type="text"
-                  className="w-full bg-transparent focus:outline-none text-gray-900"
-                  placeholder="Enter your full name"
-                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full bg-transparent border-none outline-none"
+                  required={!isLogin}
                 />
               </div>
-            </motion.div>
+            </div>
           )}
 
-          <motion.div
-            key="email-field"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="relative"
-          >
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500">
-              <FaEnvelope className="text-gray-500 mr-2" />
+          <div>
+            <label className="block text-sm text-muted mb-2">{authCopy.labels.email}</label>
+            <div className="flex items-center gap-2 glass rounded-lg p-3">
+              <FaEnvelope className="text-kijiji-accent" />
               <input
                 type="email"
-                className="w-full bg-transparent focus:outline-none text-gray-900"
-                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-transparent border-none outline-none"
                 required
               />
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            key="password-field"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="relative"
-          >
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500">
-              <FaLock className="text-gray-500 mr-2" />
+          <div>
+            <label className="block text-sm text-muted mb-2">{authCopy.labels.password}</label>
+            <div className="flex items-center gap-2 glass rounded-lg p-3">
+              <FaLock className="text-kijiji-accent" />
               <input
                 type="password"
-                className="w-full bg-transparent focus:outline-none text-gray-900"
-                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-transparent border-none outline-none"
+                minLength={isLogin ? undefined : 8}
+                autoComplete={isLogin ? "current-password" : "new-password"}
                 required
               />
             </div>
-          </motion.div>
+          </div>
 
-          {/* 🔹 Submit Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
-          >
-            {isLogin ? "Login" : "Sign Up"}
-          </motion.button>
+          <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
+            {isSubmitting
+              ? authCopy.submit.loading
+              : isLogin
+                ? authCopy.submit.signIn
+                : authCopy.submit.signUp}
+          </button>
         </form>
 
-        {/* 🔹 Toggle Button */}
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-4 text-center text-gray-600"
-        >
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 font-semibold hover:underline focus:outline-none"
-          >
-            {isLogin ? "Sign Up" : "Login"}
+        <p className="mt-4 text-center text-muted text-sm">
+          <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-kijiji-accent">
+            {isLogin ? authCopy.toggle.toSignUp : authCopy.toggle.toSignIn}
           </button>
-        </motion.p>
+        </p>
+
+        <button type="button" onClick={continueAsGuest} className="w-full text-center text-muted text-sm mt-4 py-2">
+          {authCopy.guest}
+        </button>
       </motion.div>
     </div>
   );
-};
-
-export default Auth;
+}

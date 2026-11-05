@@ -1,154 +1,162 @@
-import { motion } from "framer-motion";
-import React from "react";
+import { lazy, Suspense, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer";
+import { motion, useScroll, useTransform } from "framer-motion";
+import HeroSearchBar from "../components/discovery/HeroSearchBar";
+import ResumePrompt from "../components/discovery/ResumePrompt";
+import PlaceCarousel from "../components/discovery/PlaceCarousel";
+import MoodSelector from "../components/discovery/MoodSelector";
+import ItineraryPreview from "../components/discovery/ItineraryPreview";
+import Footer from "../components/layout/Footer";
+import ScrollReveal from "../components/ui/ScrollReveal";
+import {
+  getPlaces,
+  getBecauseYouLiked,
+  getWeather,
+  getRecentSearchSession,
+  dismissSearchSession,
+} from "../lib/api";
+import { home } from "../lib/copy";
+import { useGeolocation } from "../hooks/useGeolocation";
 
-const Home = () => {
+// Leaflet is heavy; load the map section after the rest of the page.
+const MapExploreSection = lazy(() => import("../components/discovery/MapExploreSection"));
+
+export default function Home() {
   const navigate = useNavigate();
+  const { location } = useGeolocation();
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
+  const [trending, setTrending] = useState([]);
+  const [hiddenGems, setHiddenGems] = useState([]);
+  const [allPlaces, setAllPlaces] = useState([]);
+  const [becauseYouLiked, setBecauseYouLiked] = useState([]);
+  const [weatherNote, setWeatherNote] = useState("");
+  const [resumeSession, setResumeSession] = useState(null);
+
+  useEffect(() => {
+    if (!localStorage.getItem("kijiji_onboarded")) {
+      navigate("/onboarding");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    getPlaces({ trending: "true" }).then(setTrending).catch(console.error);
+    getPlaces({ hidden_gem: "true" }).then(setHiddenGems).catch(console.error);
+    getPlaces().then(setAllPlaces).catch(console.error);
+    if (localStorage.getItem("userToken")) {
+      getBecauseYouLiked().then((d) => setBecauseYouLiked(d.places || [])).catch(() => {});
+    }
+    getRecentSearchSession().then(setResumeSession).catch(() => setResumeSession(null));
+  }, []);
+
+  useEffect(() => {
+    getWeather(location.latitude, location.longitude)
+      .then((w) => {
+        if (w.is_rainy) {
+          setWeatherNote(home.weatherRain);
+        }
+      })
+      .catch(() => {});
+  }, [location.latitude, location.longitude]);
+
+  const handleResumeContinue = () => {
+    if (!resumeSession) return;
+    navigate("/results", {
+      state: {
+        q: resumeSession.q || resumeSession.location || "",
+        location: resumeSession.location || resumeSession.q || "Nairobi",
+        mood: resumeSession.mood || "peaceful",
+        time_available_minutes: resumeSession.time_available_minutes || 180,
+        budget_max: resumeSession.budget_max || 5000,
+        companions: resumeSession.companions || "solo",
+        category: resumeSession.category || "",
+        latitude: resumeSession.latitude,
+        longitude: resumeSession.longitude,
+      },
+    });
+  };
+
+  const handleResumeDismiss = async () => {
+    try {
+      await dismissSearchSession();
+    } catch {
+      /* still hide locally */
+    }
+    setResumeSession(null);
+  };
 
   return (
-    <div className="font-sans">
-      {/* Header */}
-      <header className="bg-white text-black py-4 shadow-md fixed w-full top-0 z-50">
-        <div className="container mx-auto px-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Nairobi Nest</h1>
-          <nav>
-            <ul className="flex space-x-6 text-lg">
-              <li>
-                <a href="#home" className="hover:text-brown-600">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="#about" className="hover:text-brown-600">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="hover:text-brown-600">
-                  Services
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero Section */}
+    <div className="bg-kijiji-deep">
       <section
-        id="home"
-        className="relative h-screen flex items-center justify-center text-white"
-        style={{
-          backgroundImage: "url('/images/hero1.webp')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        ref={heroRef}
+        className="relative min-h-[90vh] flex flex-col justify-end pb-12 overflow-hidden"
       >
-        <div className="absolute inset-0  bg-opacity-10"></div>
-        <motion.div
-          className="relative text-center z-10"
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-6xl font-bold mb-4 drop-shadow-lg">
-            Find Your Perfect Stay. Home away from home!
-          </h1>
-          <p className="text-xl mb-6 drop-shadow-lg">
-            Effortless Booking, Unmatched Comfort! ✨🏨
-          </p>
-          <motion.button
-            onClick={() => navigate("/search")}
-            className="bg-brown-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-brown-800 transition duration-300"
-            whileHover={{ scale: 1.05 }}
-          >
-            Get Started
-          </motion.button>
-        </motion.div>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="py-20 bg-white text-black">
-        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <motion.div className="absolute inset-0 scale-110" style={{ y: heroY }}>
           <img
-            src="/images/about.webp"
-            alt="About Us"
-            className="rounded-lg shadow-lg"
+            src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600"
+            alt=""
+            className="w-full h-full object-cover"
           />
-          <div>
-            <h2 className="text-4xl font-bold mb-4">About Nairobi Nest</h2>
-            <p className="text-lg mb-4">
-              Nairobi Nest is a premier hotel booking platform designed to
-              simplify your travel experience by offering a wide range of
-              hotels, easy search and booking, and secure payment options. Our
-              goal is to connect travelers with the best accommodations in
-              Nairobi and beyond, ensuring a seamless, hassle-free booking
-              process.
+        </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-kijiji-deep via-kijiji-deep/60 to-kijiji-deep/20" />
+
+        <div className="relative z-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-10"
+          >
+            <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl text-kijiji-text mb-4 leading-tight">
+              {home.heroTitle}
+            </h1>
+            <p className="text-muted text-lg md:text-xl max-w-2xl mx-auto">
+              {home.heroSubtitle}
             </p>
-            <p className="text-lg">
-              Whether you're looking for luxury, budget-friendly stays, or
-              hidden gems, our AI-powered recommendations help you find the
-              perfect match tailored to your preferences. At Nairobi Nest, we
-              make hotel booking effortless, secure, and personalized for every
-              traveler. 🌍🔍💳
-            </p>
-          </div>
+            {weatherNote && (
+              <p className="text-kijiji-accent text-sm mt-3">{weatherNote}</p>
+            )}
+          </motion.div>
+
+          {resumeSession ? (
+            <ResumePrompt
+              session={resumeSession}
+              onContinue={handleResumeContinue}
+              onDismiss={handleResumeDismiss}
+            />
+          ) : (
+            <HeroSearchBar />
+          )}
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-brown-100 text-black">
-        <div className="container mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center mb-8">Our Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              {
-                title: "Wide Range of Hotels",
-                description:
-                  "Choose from various hotels, from budget to luxury.",
-                img: "/images/service1.webp",
-              },
-              {
-                title: "Easy Booking",
-                description: "Book your ideal stay in just a few clicks.",
-                img: "/images/service2.webp",
-              },
-              {
-                title: "Secure Payments",
-                description:
-                  "We ensure safe and reliable transactions for your bookings.",
-                img: "/images/service3.webp",
-              },
-              {
-                title: "AI Recommendations",
-                description:
-                  "Get AI-powered hotel suggestions based on your preferences.",
-                img: "/images/service4.webp",
-              },
-            ].map((service, index) => (
-              <motion.div
-                key={index}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.5 }}
-              >
-                <img
-                  src={service.img}
-                  alt={service.title}
-                  className="w-full h-40 object-cover rounded-md mb-4"
-                />
-                <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-                <p>{service.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ScrollReveal>
+        <PlaceCarousel title={home.carousels.trending} places={trending} />
+      </ScrollReveal>
+
+      {becauseYouLiked.length > 0 && (
+        <ScrollReveal>
+          <PlaceCarousel title={home.carousels.becauseYouLiked} places={becauseYouLiked} />
+        </ScrollReveal>
+      )}
+
+      <MoodSelector />
+      <Suspense fallback={<div className="h-96" />}>
+        <MapExploreSection places={allPlaces} />
+      </Suspense>
+      <ItineraryPreview />
+
+      <ScrollReveal>
+        <PlaceCarousel
+          title={home.carousels.hiddenGems}
+          places={hiddenGems}
+          subtitle={home.carousels.hiddenGemsSubtitle}
+        />
+      </ScrollReveal>
 
       <Footer />
     </div>
   );
-};
-
-export default Home;
+}

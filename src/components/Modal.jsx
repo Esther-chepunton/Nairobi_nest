@@ -1,43 +1,41 @@
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { modal as modalCopy } from "../lib/copy";
 
-const Modal = ({ isOpen, onClose, onLogin }) => {
+export default function Modal({ isOpen, onClose, message }) {
+  const navigate = useNavigate();
+
+  const goToAuth = () => {
+    sessionStorage.setItem("authRedirect", window.location.pathname);
+    onClose?.();
+    navigate("/auth");
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-          initial={{ opacity: 0 }} // Start invisible
-          animate={{ opacity: 1 }} // Fade in
-          exit={{ opacity: 0 }} // Fade out when closing
+          className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-white p-6 rounded-lg shadow-lg w-96 relative"
-            initial={{ scale: 0.8, opacity: 0 }} // Start smaller and invisible
-            animate={{ scale: 1, opacity: 1 }} // Scale up and fade in
-            exit={{ scale: 0.8, opacity: 0 }} // Scale down and fade out
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="glass-card p-6 w-full max-w-sm"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
           >
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Login Required
-            </h2>
-            <p className="text-gray-700 mb-4">
-              You need to log in or sign up to book a hotel.
+            <h2 className="font-serif text-xl text-kijiji-text mb-3">{modalCopy.title}</h2>
+            <p className="text-muted mb-6">
+              {message || modalCopy.defaultMessage}
             </p>
-
-            {/* Buttons */}
-            <div className="flex justify-end">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg mr-2 hover:bg-gray-500 transition duration-300"
-              >
-                Cancel
+            <div className="flex gap-3">
+              <button type="button" onClick={onClose} className="btn-outline flex-1">
+                {modalCopy.cancel}
               </button>
-              <button
-                onClick={onLogin}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
-              >
-                Login / Sign Up
+              <button type="button" onClick={goToAuth} className="btn-primary flex-1">
+                {modalCopy.confirm}
               </button>
             </div>
           </motion.div>
@@ -45,6 +43,4 @@ const Modal = ({ isOpen, onClose, onLogin }) => {
       )}
     </AnimatePresence>
   );
-};
-
-export default Modal;
+}

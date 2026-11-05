@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.local
+.env.*.local
+*.db
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +26,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python backend (when committed as part of this repo)
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+nairobi-nest-backend/instance/
+
+# Local backup of the old standalone backend repo (history is also on GitHub)
+.backend-git-backup/
+# Local Claude/editor launch config
+.claude/

@@ -1,0 +1,44 @@
+adapters:
+  openstreetmap:
+    enabled: true
+    reliability: 0.90
+    requests_per_minute: 30
+    daily_quota: 5000
+    bbox:
+      south: -4.7
+      west: 33.9
+      north: 4.6
+      east: 41.9
+
+  wikipedia:
+    enabled: true
+    reliability: 0.85
+    requests_per_minute: 60
+    daily_quota: 2000
+    search_terms:
+      - Nairobi tourism
+      - Kenya national parks
+      - Kenya waterfalls
+      - Nairobi museums
+
+  rss:
+    enabled: true
+    reliability: 0.80
+    requests_per_minute: 20
+    feeds:
+      - url: https://www.magicalkenya.com/feed/
+        name: magical_kenya
+      - url: https://www.nairobi.go.ke/feed/
+        name: nairobi_county
+
+  youtube:
+    enabled: false
+    reliability: 0.70
+    requests_per_minute: 10
+
+scraper_allowlist:
+  - magicalkenya.com
+  - kws.go.ke
+  - museums.or.ke
+
+default_user_agent: "KijijiDiscovery/1.0 (portfolio project; +https://github.com/Esther-chepunton/nairobi-nest-backend)"

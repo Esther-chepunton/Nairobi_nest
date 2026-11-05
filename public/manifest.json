@@ -1,0 +1,10 @@
+{
+  "name": "Kijiji — Discover Kenya",
+  "short_name": "Kijiji",
+  "description": "Find experiences worth remembering. Curated for your mood, your time, and the people you're with.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1414",
+  "theme_color": "#4AD4C4",
+  "icons": []
+}
