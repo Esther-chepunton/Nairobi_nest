@@ -1,0 +1,50 @@
+categories:
+  trail:
+    osm_tags: ["highway=path", "route=hiking"]
+    keywords: ["trail", "hike", "hiking", "walk", "trek"]
+  waterfall:
+    osm_tags: ["waterway=waterfall", "natural=waterfall"]
+    keywords: ["waterfall", "falls", "cascade"]
+  museum:
+    osm_tags: ["tourism=museum"]
+    keywords: ["museum", "gallery", "exhibit"]
+  market:
+    osm_tags: ["amenity=marketplace", "shop=marketplace"]
+    keywords: ["market", "bazaar", "souq"]
+  cafe:
+    osm_tags: ["amenity=cafe"]
+    keywords: ["cafe", "café", "coffee", "bakery"]
+  park:
+    osm_tags: ["leisure=park", "boundary=national_park"]
+    keywords: ["park", "garden", "reserve", "sanctuary"]
+  viewpoint:
+    osm_tags: ["tourism=viewpoint"]
+    keywords: ["viewpoint", "lookout", "scenic"]
+  cultural:
+    osm_tags: ["tourism=attraction", "historic=*"]
+    keywords: ["cultural", "heritage", "historic", "monument"]
+  restaurant:
+    osm_tags: ["amenity=restaurant"]
+    keywords: ["restaurant", "dining", "eatery"]
+  event:
+    keywords: ["event", "festival", "concert", "exhibition"]
+
+mood_keywords:
+  peaceful: ["quiet", "serene", "nature", "forest", "garden"]
+  adventurous: ["hike", "trek", "climb", "safari", "adventure"]
+  romantic: ["sunset", "cafe", "couple", "scenic", "wine"]
+  family: ["family", "kids", "playground", "zoo", "park"]
+  local-culture: ["market", "museum", "cultural", "heritage"]
+  photographer: ["viewpoint", "sunrise", "sunset", "scenic", "photography"]
+
+companion_keywords:
+  solo: ["solo", "quiet", "meditation"]
+  couple: ["romantic", "couple", "date"]
+  family: ["family", "kids", "children"]
+  friends: ["group", "friends", "social"]
+
+intent_geo:
+  nairobi:
+    latitude: -1.286389
+    longitude: 36.817223
+    radius_km: 50

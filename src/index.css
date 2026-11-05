@@ -1,117 +1,199 @@
 @import "tailwindcss";
 
-/* Apply styles globally */
+@theme {
+  --color-kijiji-deep: #0b1414;
+  --color-kijiji-mid: #0f1d1d;
+  --color-kijiji-card: #132626;
+  --color-kijiji-elevated: #1a3232;
+  --color-kijiji-muted: #2e4d4d;
+  --color-kijiji-accent: #4a8484;
+  --color-kijiji-text: #ebf5f1;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
 :root {
-  font-family: "Inter", Avenir, Helvetica, Arial, sans-serif;
+  --kijiji-bg-deep: #0b1414;
+  --kijiji-bg-mid: #0f1d1d;
+  --kijiji-bg-card: #132626;
+  --kijiji-bg-elevated: #1a3232;
+  --kijiji-bg-muted: #2e4d4d;
+  --kijiji-accent: #4a8484;
+  --kijiji-text: #ebf5f1;
+  font-family: var(--font-sans);
   line-height: 1.6;
-  font-weight: 400;
-  background-color: #ffffff;
-  color: #2d1b0a;
-  /* Dark brown for better contrast */
+  background-color: var(--kijiji-bg-deep);
+  color: var(--kijiji-text);
   scroll-behavior: smooth;
 }
 
-/* Center the app and make it full-height */
 body {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+  background-color: var(--kijiji-bg-deep);
 }
 
-/* Main container that ensures full height for all pages */
 #root {
   min-height: 100vh;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Typography */
-h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-align: center;
-  color: #4a2c16;
-  /* Deep brown for headings */
+.font-serif {
+  font-family: var(--font-serif);
 }
 
-h2 {
-  font-size: 2rem;
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card {
+  background: rgba(19, 38, 38, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 132, 132, 0.2);
+  border-radius: 16px;
+}
+
+.btn-primary {
+  background: var(--kijiji-accent);
+  color: var(--kijiji-text);
   font-weight: 600;
-  color: #5a3a1b;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
 }
 
-h3 {
-  font-size: 1.5rem;
+.btn-primary:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--kijiji-text);
   font-weight: 500;
-  color: #6b4a2d;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(235, 245, 241, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
-  }
+.btn-outline:hover {
+  border-color: var(--kijiji-accent);
+  color: var(--kijiji-accent);
+}
 
-  h2 {
-    font-size: 1.5rem;
-  }
+.tag-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: rgba(74, 132, 132, 0.15);
+  color: var(--kijiji-accent);
+  border: 1px solid rgba(74, 132, 132, 0.35);
+}
 
-  h3 {
-    font-size: 1.25rem;
+.tag-pill-outline {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: transparent;
+  color: var(--kijiji-accent);
+  border: 1px solid rgba(74, 132, 132, 0.5);
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--kijiji-text);
+}
+
+.text-muted {
+  color: rgba(235, 245, 241, 0.6);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.leaflet-container {
+  background: var(--kijiji-bg-mid) !important;
+  border-radius: 16px;
+}
+
+.kijiji-marker-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+.kijiji-marker {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--kijiji-accent);
+  box-shadow: 0 0 12px rgba(74, 132, 132, 0.8), 0 0 24px rgba(74, 132, 132, 0.4);
+  animation: pinDrop 0.6s ease-out backwards, pinPulse 2s ease-in-out 0.6s infinite;
+}
+
+@keyframes pinDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-/* Links */
+@keyframes pinPulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(74, 132, 132, 0.8), 0 0 24px rgba(74, 132, 132, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(74, 132, 132, 1), 0 0 36px rgba(74, 132, 132, 0.6);
+  }
+}
+
 a {
-  font-weight: 500;
-  color: #8b572a;
-  /* Warm brown for links */
+  color: var(--kijiji-accent);
   text-decoration: none;
 }
 
-a:hover {
-  color: #a35d2a;
-  /* Slightly lighter brown on hover */
-  text-decoration: underline;
-}
-
-/* Buttons */
-button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
+input, select, textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--kijiji-text);
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  background-color: #4a2c16;
-  color: white;
+  padding: 0.5rem 0.75rem;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  background-color: #5a3a1b;
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--kijiji-accent);
 }
 
-/* Make sure buttons and text adjust for dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: rgba(255, 255, 255, 0.9);
-    background-color: #121212;
-  }
+.card-hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  button {
-    background-color: #2d1b0a;
-    color: white;
-  }
-
-  a:hover {
-    color: #d2a679;
-    /* Softer brown for hover effect in dark mode */
-  }
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }

@@ -1,0 +1,51 @@
+# Render Blueprint — free tier only.
+#
+# Database: Neon Postgres (free, never expires). Create a project at https://neon.tech,
+# copy the pooled connection string, and paste it as DATABASE_URL when Render asks.
+# Scheduled ingestion runs on GitHub Actions (.github/workflows/ingest.yml), not Render
+# cron jobs, which are paid.
+#
+# Free web services sleep after ~15 minutes idle; the first request then takes ~30-60 s.
+# The frontend shows a "waking up the server" message while that happens.
+
+services:
+  - type: web
+    name: kijiji-backend
+    runtime: python
+    plan: free
+    rootDir: nairobi-nest-backend
+    buildCommand: pip install -r requirements.txt
+    # Tables are created on boot (db.create_all + additive column migrations).
+    startCommand: gunicorn "run:app" --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # Neon connection string (postgresql://...?sslmode=require)
+      - key: CORS_ORIGINS
+        value: https://nairobi-nest.vercel.app,http://localhost:5173
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: WORKER_SECRET
+        generateValue: true
+      # M-Pesa Daraja sandbox (https://developer.safaricom.co.ke). Shortcode 174379 is the
+      # public sandbox Paybill; the passkey is shown on the Daraja "Lipa Na M-Pesa" simulator.
+      - key: MPESA_ENV
+        value: sandbox
+      - key: MPESA_SHORTCODE
+        value: "174379"
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_CALLBACK_URL
+        sync: false # https://<your-service>.onrender.com/api/mpesa-callback
+      - key: OPENWEATHER_API_KEY
+        sync: false # optional
